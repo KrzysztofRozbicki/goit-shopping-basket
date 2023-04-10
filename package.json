@@ -4,6 +4,7 @@
   "description": "STICKY-NOTES APP Created @Krzysztof Rozbicki 08-04-2023\r https://krzysztofrozbicki.github.io/sticky-notes/",
   "scripts": {
     "start": "parcel src/index.html",
+    "server": "json-server --watch db.json",
     "build": "parcel build src/index.html --public-url /goit-shopping-basket/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,6 +20,8 @@
   },
   "homepage": "https://github.com/KrzysztofRozbicki/goit-shopping-basket#readme",
   "devDependencies": {
+    "flowbite": "^1.6.4",
+    "json-server": "^0.17.3",
     "parcel": "^2.8.3",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.3.1"
