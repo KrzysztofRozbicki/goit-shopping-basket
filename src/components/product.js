@@ -1,4 +1,22 @@
-export const createProduct = ({ name, image, price, rating }) => {
+export const createProduct = ({ name, image, price, rating, pictures }) => {
+  const insertGallery = pictures => {
+    let returnHTMLcode = '';
+    pictures.forEach(picture => {
+      const addHTMLcode = `
+      <a href="${picture}" data-fancybox="${name}" data-caption="${name}   $${price}" class="hidden">
+                    <img
+        width="400"
+        height="400"
+          class="p-8 rounded-t-lg"
+          data-images="https://i.dummyjson.com/data/products/2/1.jpg, https://i.dummyjson.com/data/products/2/2.jpg, https://i.dummyjson.com/data/products/2/3.jpg, https://i.dummyjson.com/data/products/2/thumbnail.jpg"
+          src="${picture}"
+          alt="${name}"
+        />
+    </a>`;
+      returnHTMLcode += addHTMLcode;
+    });
+    return returnHTMLcode;
+  };
   const oneStar = `<svg
     aria-hidden="true"
     class="w-5 h-5 text-yellow-300"
@@ -19,22 +37,28 @@ export const createProduct = ({ name, image, price, rating }) => {
     return codeHTML;
   };
 
-  return ` <div
-      class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+  return ` <div 
+      class="gallery w-[20%] max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
     >
-      <a href="#">
+      <a href="${image}" data-fancybox="${name}" data-caption="${name}   $${price}">
         <img
-          class="p-8 rounded-t-lg"
+        width="400"
+        height="400"
+          class="p-0 mb-2 rounded-t-lg thumbnail"
+          data-images="https://i.dummyjson.com/data/products/2/1.jpg, https://i.dummyjson.com/data/products/2/2.jpg, https://i.dummyjson.com/data/products/2/3.jpg, https://i.dummyjson.com/data/products/2/thumbnail.jpg"
           src="${image}"
-          alt="product image"
+          alt="${name}"
         />
-      </a>
-      <div class="px-5 pb-5">
+        </a>
+        ${insertGallery(pictures)}
+      
+      <div class="px-5 pb-5 flex flex-col justify-between h-auto">
         <a href="#">
           <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
             ${name}
           </h5>
         </a>
+        <div>
         <div class="flex items-center mt-2.5 mb-5">
         ${createStars(rating)}
           <span
@@ -42,14 +66,30 @@ export const createProduct = ({ name, image, price, rating }) => {
             >${rating}</span
           >
         </div>
-        <div class="flex items-center justify-between">
-          <span class="text-3xl font-bold text-gray-900 dark:text-white">$${price}</span>
+        <div class="flex flex-col items-center justify-between">
+          <span class="text-3xl mb-2 font-bold text-gray-900 dark:text-white">$${price}</span>
           <a
             href="#"
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >Add to cart</a
           >
         </div>
+        </div>
       </div>
     </div>`;
+};
+
+export const showProduct = array, element => {
+  
+  element.innerHTML = '';
+  array.forEach(
+    product =>
+      (element.innerHTML += createProduct({
+        name: product.title,
+        image: product.thumbnail,
+        price: discountedPrice(product),
+        rating: product.rating,
+        pictures: product.images,
+      }))
+  );
 };
