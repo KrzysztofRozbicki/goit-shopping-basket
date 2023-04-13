@@ -165,7 +165,7 @@ const buildWebsite = async array => {
   getProductsFromCategory();
 };
 
-prepareDroppedMenu();
+// prepareDroppedMenu();
 loadCart();
 
 fetch(`${API_URL}/products`)
