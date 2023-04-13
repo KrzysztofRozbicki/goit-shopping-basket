@@ -1,9 +1,17 @@
-export const createProduct = ({ name, image, price, rating, pictures }) => {
+const createProduct = product => {
+  const STAR_SIZE = 1.5;
+  const STAR_VIEWBOX = 16;
+  const name = product.title;
+  const image = product.thumbnail;
+  const discountPrice = discountedPrice(product);
+  const rating = product.rating;
+  const pictures = product.images;
+
   const insertGallery = pictures => {
     let returnHTMLcode = '';
     pictures.forEach(picture => {
       const addHTMLcode = `
-      <a href="${picture}" data-fancybox="${name}" data-caption="${name}   $${price}" class="hidden">
+      <a href="${picture}" data-fancybox="${name}" data-caption="${name}   $${discountPrice}" class="hidden">
                     <img
         width="400"
         height="400"
@@ -17,11 +25,12 @@ export const createProduct = ({ name, image, price, rating, pictures }) => {
     });
     return returnHTMLcode;
   };
-  const oneStar = `<svg
+  const oneStar = (width, pos) => `<svg
     aria-hidden="true"
-    class="w-5 h-5 text-yellow-300"
+    class="w-6 h-6 text-yellow-300 relative"
+    style="left: -${pos}rem;"
     fill="currentColor"
-    viewBox="0 0 20 20"
+    viewBox="${2 - width} 2 16 16"
     xmlns="http://www.w3.org/2000/svg"
   >
     <title>First star</title>
@@ -30,17 +39,21 @@ export const createProduct = ({ name, image, price, rating, pictures }) => {
 
   const createStars = rating => {
     let codeHTML = '';
-    const amountOfStars = Math.round(rating);
+    const amountOfStars = Math.floor(rating);
     for (let i = 0; i < amountOfStars; i++) {
-      codeHTML += oneStar;
+      codeHTML += oneStar(0, 0);
     }
+    const rest = +(rating - Math.floor(rating)).toFixed(2);
+    const width = STAR_VIEWBOX - Math.floor(STAR_VIEWBOX * rest);
+    const pos = STAR_SIZE - STAR_SIZE * rest;
+    codeHTML += oneStar(width, pos);
     return codeHTML;
   };
 
-  return ` <div 
-      class="gallery w-[20%] max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+  return ` <div id="product-card"
+      class="gallery w-[17%] max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
     >
-      <a href="${image}" data-fancybox="${name}" data-caption="${name}   $${price}">
+      <a href="${image}" data-fancybox="${name}" data-caption="${name}   $${discountPrice}">
         <img
         width="400"
         height="400"
@@ -54,7 +67,7 @@ export const createProduct = ({ name, image, price, rating, pictures }) => {
       
       <div class="px-5 pb-5 flex flex-col justify-between h-auto">
         <a href="#">
-          <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+          <h5 class="text-xl text-center font-semibold tracking-tight text-gray-900 h-20 flex flex-col justify-center items-center dark:text-white">
             ${name}
           </h5>
         </a>
@@ -66,30 +79,44 @@ export const createProduct = ({ name, image, price, rating, pictures }) => {
             >${rating}</span
           >
         </div>
-        <div class="flex flex-col items-center justify-between">
-          <span class="text-3xl mb-2 font-bold text-gray-900 dark:text-white">$${price}</span>
-          <a
-            href="#"
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >Add to cart</a
-          >
+        <div class="flex flex-col items-center items-center justify-between">
+          ${showPrice(product)}
+   <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" type="button" data-drawer-target="drawer-right-example" data-drawer-show="drawer-right-example" data-drawer-placement="right" aria-controls="drawer-right-example">
+   Add to Cart
+   </button>
         </div>
         </div>
       </div>
     </div>`;
 };
 
-export const showProduct = array, element => {
-  
+export const discountedPrice = product => {
+  let correctPrice = product.price;
+  if (product.isDiscount)
+    correctPrice = product.price - product.price * (product.discountPercentage / 100);
+  correctPrice = correctPrice.toFixed(2);
+  return correctPrice;
+};
+
+const showPrice = product => {
+  const element = document.createElement('p');
+  element.classList.add('mb-4', 'items-center', 'flex', 'flex-col');
+  const regularPrice = `<p class="text-2xl mb-12 font-bold text-gray-900 dark:text-white">$${product.price.toFixed(
+    2
+  )}</p>`;
+  const discountPrice = `<p class="text-xl mb-2 font-bold text-red-700 text-gray-900 dark:text-white line-through">$${product.price.toFixed(
+    2
+  )}</p>
+  <p class="text-3xl mb-2 font-bold text-gray-900 text-green-700 dark:text-white">$${discountedPrice(
+    product
+  )}</p >`;
+
+  if (product.isDiscount) element.innerHTML = discountPrice;
+  else element.innerHTML = regularPrice;
+  return element.outerHTML;
+};
+
+export const showProduct = (array, element) => {
   element.innerHTML = '';
-  array.forEach(
-    product =>
-      (element.innerHTML += createProduct({
-        name: product.title,
-        image: product.thumbnail,
-        price: discountedPrice(product),
-        rating: product.rating,
-        pictures: product.images,
-      }))
-  );
+  array.forEach(product => (element.innerHTML += createProduct(product)));
 };
