@@ -168,6 +168,6 @@ const buildWebsite = async array => {
 // prepareDroppedMenu();
 loadCart();
 
-fetch(`${API_URL}/products`)
+fetch(`https://raw.githubusercontent.com/KrzysztofRozbicki/goit-shopping-basket/main/db.json`)
   .then(res => res.json())
   .then(buildWebsite);
